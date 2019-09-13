@@ -10,6 +10,9 @@ The diode is needed to protect the circuit, because the solenoid will produce cu
 
 The 1K resistor is used as a current protection to the arduino digital out pin. Don't think this is really necessary, just to be safe.
 
+The circuit is used with a 12V push-pull solenoid, XRN-0530:
+![](Push-pull-solenoid-12V.jpg)
+
 ![](solenoid-driver_bb.svg)
 
 |Part|Description|
