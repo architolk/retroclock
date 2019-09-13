@@ -11,3 +11,10 @@ The diode is needed to protect the circuit, because the solenoid will produce cu
 The 1K resistor is used as a current protection to the arduino digital out pin. Don't think this is really necessary, just to be safe.
 
 ![](solenoid-driver_bb.svg)
+
+|Part|Description|
+|----|-----------|
+| Q1 | IRF540 Power MOSFET |
+| D1 | 1N4004 Diode |
+| C1 | 2200uF Electrolite capacitor |
+| R1 | 1K resistor |
