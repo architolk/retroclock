@@ -8,6 +8,8 @@ The circuit has a common ground and two voltage sources: the 5V voltage source f
 
 The PCB below is created for a perfboard solution, so all wiring is done on one side of the PCB, all components are on the other side. Some jumper wires are used to fix wiring problems. The PCB uses a 50mm x 70mm screen (24x18 raster). The headers correspond with the headers of a protoshield that is used as "shield-1". They contain all the normal Arduino UNO headers (digital In/outs, analog Ins, 5V, GND, etc).
 
+The Vin pin of the arduino is not used to power the 12V solenoids. We could provide 12V to the arduino jack and use the Vin pin as 12V source (actually probably 11.3V because of the voltage drop of the protecting diode). But this would mean that the coper tracing in the arduino uno would carry all the current for the solenoids. A "better" solution (but, again, probably overkill) would be to have the current supply for the solenoid separated from the Arduino board. This is done by having a separate 12V input. We included a protecting diode in the circuit, so inavertilly using the wrong jack will not fry the circuit.
+
 ![](shield-2_pcb.svg)
 
 The mapping of the pins of the segments to the arduino pins is done purely for the optimalization of the layout of the PCB. This means that some tinkering needs to be done to the arduino code for displaying the digits.
@@ -47,3 +49,4 @@ The table below gives the representation for all numbers:
 Inspiration:
 
 - https://www.youtube.com/watch?v=_ypW45Y8VSs
+- https://www.open-electronics.org/the-power-of-arduino-this-unknown/
