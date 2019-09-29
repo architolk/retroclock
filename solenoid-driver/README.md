@@ -32,3 +32,4 @@ Inspiration:
 - https://makezine.com/2010/06/02/drum-solenoid-interface-for-tactile/
 - https://www.wayneandlayne.com/blog/2010/06/01/drum-solenoid-interface-for-tap-tempo-metronome/
 - https://hackaday.com/2016/05/11/overthinking-solenoid-control/
+- https://www.bc-robotics.com/tutorials/controlling-a-solenoid-valve-with-arduino/
