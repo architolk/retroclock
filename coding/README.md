@@ -37,6 +37,8 @@ The buttons have different functions, regarding the specific mode. By looking at
 - First digit is a flashing C, both dots are off: set chime hour mode (M3 C);
 - First digit is a flashing d, both dots are off: set display mode (M3 d);
 - First digit is a flashing t, both dots are off: set tempo mode (M3 t);
+- First digit is a flashing F, both dots are off: set clock fine tune mode (M3 f);
+- First digit is a flashing h, both dots are off: set clock chime night mode (M3 n);
 - First digit is a flashing segment, both dots are off: set chime melody mode (M3 M);
 - Display shows a flashing number, bot dots are off: set alarm time (M3 P), showing seconds;
 - Display shows a flashing number, right dot is flashing: set alarm time (M3 P), showing minutes;
@@ -98,6 +100,8 @@ Submodes:
 - C set hour chime mode
 - tt set melody tempo
 - dd set display mode
+- F set clock fine-tune
+- n set night mode
 - C0 goto normal operation (M0)
 
 ### M3 P configuration mode
@@ -164,6 +168,14 @@ B2: either set alarm-2 or reset alarm;
 B3: either set alarm-3 or pause alarm.
 
 So if you don't want confusion, don't use display mode d0 :-)
+
+### M3 F fine tune mode
+
+In set clock fine tune mode, you can offset the seconds that are added or substracted ones every month. F1..F9 means adding  seconds, A backwards F and 1..9 means substracting seconds. F0 is default mode: no change. Using B1 you can change between adding or substracting, using B3 you can select the number of seconds. Button B2 brings you back to normal mode.
+
+### M3 n set night mode
+
+In set night mode, you can select at which time the clock chime is silent. The first digit is an h (start of night mode) or a backward h (end of night mode). You can toggle between these to with button B1. The second digit is the hour itself. You can change this with button B3. If both digits are the same, night mode is off. 0-1 means: between twelve o'clock and one o'clock. The chime will not sound at twelve o'clock and half past twelve, and start again at one o'clock.
 
 ### MC chime mode
 
