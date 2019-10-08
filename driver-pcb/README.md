@@ -4,4 +4,4 @@ This is the PCB for the three solenoids. I decided to put the solenoid driver on
 
 A ground and 11.3V header is available, to power the ardunio from this shield (the header is after the protection diode, so the actual voltage is not 12V, but a diode drop lower).
 
-![](driver-pcb_pcb.svg)
+<img src="driver-pcb_pcb.svg" width="200%"/>

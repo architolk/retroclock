@@ -42,15 +42,15 @@ The buttons have different functions, regarding the specific mode. By looking at
 - First digit is a flashing segment, both dots are off: set chime melody mode (M3 M);
 - Display shows a flashing number, bot dots are off: set alarm time (M3 P), showing seconds;
 - Display shows a flashing number, right dot is flashing: set alarm time (M3 P), showing minutes;
-- Display shows a flashing H1..H9, left dot is flashing: set alarm time (M3 P), showing hours;
+- Display shows a flashing H1..H9 or number, left dot is flashing: set alarm time (M3 P), showing hours;
 
 ### M0 Normal operation
 
 In normal operation, the display is totally off, and the chime will operate according to the chime configuration.
 
-- B1: Set alarm-1;
-- B2: Set alarm-2;
-- B3: Set alarm-3;
+- B1: Activate alarm-1;
+- B2: Activate alarm-2;
+- B3: Activate alarm-3;
 - B1+B3 (pressing B1 en B3 at the same time): go into configuration mode (M3).
 
 After setting the alarm, the alarm countdown will be shown for a couple of seconds.
@@ -91,10 +91,16 @@ Submodes:
 - P1 set alarm-1 time
 - P2 set alarm-2 time
 - P3 set alarm-3 time
+- P4 set alarm-4 time
+- P5 set alarm-5 time
+- P6 set alarm-6 time
 - A set alarm repeat mode
 - A1 set alarm-1 chime melody
 - A2 set alarm-2 chime melody
 - A3 set alarm-3 chime melody
+- A4 set alarm-4 chime melody
+- A5 set alarm-5 chime melody
+- A6 set alarm-6 chime melody
 - AH set hour chime melody
 - A- set halve hour chime melody
 - C set hour chime mode
@@ -106,12 +112,16 @@ Submodes:
 
 ### M3 P configuration mode
 
-In set alarm mode, the display will show seconds (both dots off) or minutes (right dot is flashing) or hours (left dot is flashing). In set alarm mode the numbers themselves are also flashing. Hours are displayed as "H1" to "H9".
+In set alarm mode, the display will show seconds (both dots off) or minutes (right dot is flashing) or hours (left dot is flashing). In set alarm mode the numbers themselves are also flashing. Hours are displayed as "H1" to "H9" for alarm 1, 2 and 3, and as numbers for alarm 4, 5 and 6. Seconds are only displayed for alarms 1, 2 and 3.
 
 - B1: toggle between seconds, minutes and hours;
 - B2: back to M0 mode;
 - B3: add one;
 - B1+B3: go back to configuration mode.
+
+Alarms 1, 2 and 3 are countdown alarms: these alarms sound after a specified interval and after the corresponding button is pressed.
+
+Alarms 4, 5 and 6 are clock alarms: these alarms sound at a specified point in time.
 
 ### M3 M melody configuration mode
 
