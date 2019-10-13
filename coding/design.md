@@ -11,13 +11,74 @@ The clock has eight "alarms":
 - alarm 1, 2 and 3 are stopwatch alarms and will sound after some interval;
 - alarm 4, 5 and 6 are timer alarms and will sound at a specific point in time;
 - alarm 7 is the hour chime and will sound every hour at full hour;
-- alarm 8 is the halve-hour chime and will sound every hour at halve hour.
+- alarm 8 is the half-hour chime and will sound every hour at half hour.
 
-## 0.1 currentTime()
-The function currentTime() gives the currentTime, calculated from the clock:
-- currentTime = seconds + 60 * minutes + 3600 * hours
+## 0.1 Globals
 
-## 0.2 remainingTime(timepoint)
+The following global variables are available:
+
+### 0.0.1 Configuration
+
+- clockSeconds, clockMinutes, clockHours, clockDayOfWeek (int): current time
+- alarmSeconds[0..7], alarmMinutes[0..7], alarmHours[0..7], alarmDayOfWeek (int): alarm time.
+- alarmTempo[0..7]: the speed of the alarm melody per alarm.
+- alarmChimeMelody[0..7,0..2]: the melody per chime, per alarm.
+- alarmMelodyRepeat[0..7]: the number of times the melody is repeated, or 20 (continiously / chime hours)
+- displayMode: the particular display mode;
+- clockFineTune: parameter that fine tunes the speed of the clock
+- nightStart, nightEnd: beginning and ending of the night (display will be off, no hour or half-hour chimes)
+
+### 0.0.2 Operation variables
+
+- alarmTime[0..7] (longint): the time (in seconds) a particular alarm should sound;
+- alarmActivated[0..7] (boolean): whether an alarm is active;
+- alarmPaused (boolean): indicates if the alarm is paused;
+- clockMode (int): the mode of the clock. This dictates the function of every button;
+- configMode (int): the selected configuration mode (from clockMode 5 and higher);
+- sectionMode (int): specifying wether seconds, minutes, hours or day-of-week is displayed;
+- selectedChime (int): specifies the chime (0..2) that is the active configuration parameter;
+- melodyPosition (int): specifies the active melody position;
+- selectedNightParam (int): specifies if the nightStart or nightEnd parameter is active.
+
+By default alarmTime[0..2] are set to 24*3600 and alarmActivated[0..2] are set to FALSE. alarmTime[3..5] are set according to the value of getAlarmTime(3..5). alarmTime[6] is set to getNextHourTime() and alarmTime[7] is set to getNextHalfHourTime(). alarmActivated[3..7] are set to TRUE. alarmPaused is set to FALSE.
+
+### 0.0.3 Display
+
+- leftDigitChar (int): character to be displayed in left digit (0..9 are numbers, onward are characters)
+- rightDigitChar (int): character to be displayed in right digit
+- digitMode (int): digitmode (off, normal, flashing, segment mode)
+- dotMode (int): the way the dots are used (off, normal, flashing, alternating)
+- rightDigitSegments (int): binary coding of the right digit (making every combination possible)
+- rightDigitSegmentFlash (int): binary coding of what segment should flash. Values should be powers of 2.
+
+### 0.0.4 Chimes
+
+- chimeMelody[0..2]: the melody per chime (a binary coded number)
+- melodyCount: the number of times the melody needs to play, or 20 for continiously
+- melodyTempo: the speed of the melody
+- melodyStep: the particular step of the melody
+
+## 0.1 getSeconds(seconds,minutes,hours)
+Helper function that calculates the number of seconds: seconds + 60 * minutes + 3600 * hours.
+
+## 0.2 currentTime()
+Gives the currentTime in seconds, calculated from the clock:
+- currentTime = getSeconds(clockSeconds, clockMinutes, clockHours)
+
+## 0.3 getAlarmTime(alarm)
+Give the next alarm in seconds, calculated from the particular alarm variables:
+- getAlarmTime = getSeconds(alarmSeconds[alarm], alarmMinutes[alarm], alarmHours[alarm])
+
+## 0.4 GetNextHourTime()
+Give the next full hour:
+- getNextHourTime = getSeconds(0, 0, clockHours+1 modulo 24)
+
+## 0.5 GetNextHalfHourTime()
+Give the next half hour:
+- getNextHalfHourTime = getSeconds(0, 30, clockHours) when clockMinutes < 30
+- getNextHalfHourTime = getSeconds(0, 30, clockHours+1 modulo 24) when clockMinutes > 29
+
+## 0.6 remainingTime(timepoint)
 The function remainingTime() give the remaining seconds between the timepoint and the currentTime():
 - if timepoint > currentTime() then remainingTime = timepoint - currentTime();
 - if timepoint + 12*3600 < currentTime() then remainingTime = timepoint + 24*3600 - currentTime(); (different days)
@@ -25,17 +86,8 @@ The function remainingTime() give the remaining seconds between the timepoint an
 
 If the alarm is passed, not pausedTime is used instead of currentTime()
 
-## 0.3 seconds(timepoint)
-Returns the seconds-part of a timepoint
-
-## 0.4 minutes(timepoint)
-Returns the minutes-part of a timepoint
-
-## 0.5 hours(timepoint)
-Returns the hours-part of a timepoint
-
 ## 1. Main loop
-Calls the scan methods and the display and chime methods
+Calls the scan, display and chime methods
 
 An important variable is the clockMode variable. This variable controles what mode the clock is:
 - 0: Normal mode (display is black) [M0]
@@ -65,14 +117,33 @@ The call performed on the down-side of the button-gate, otherwise it is not poss
 ## 1.2 scanClockTick
 Method scans the clock tick operation. Every clock tick, a call to the clockTick method is performed. The call is performed on the up-side of the clock tick.
 
+Every particular interval, the clock gets an extra tick. This is controlled with a function from the clockFineTune parameter. Zero means no extra tick, the higher the value, the more ticks are generated per interval.
+
 ## 1.3 clockTick
-advances the seconds, minutes and/or hours every other clocktick. When clockMode is 4 (clock mode), the display is set according to the showHourMinutesSecondsStatus:
+advances the seconds, minutes and/or hours every other clocktick. When clockMode is 4 (clock mode), the display is set according to the sectionMode:
 
-- 0: show seconds, dotMode = 0;
-- 1: show minutes, dotMode alternates between 0 en 1 (right dot flashes every second)
-- 2: show hours, dotMode alternates between 0 en 2 (left dot flashes every second)
+- 0: show clockSeconds, dotMode = 0;
+- 1: show clockMinutes, dotMode alternates between 0 en 1 (right dot flashes every second)
+- 2: show clockHours, dotMode alternates between 0 en 2 (left dot flashes every second)
+- 3: show day-of-week
 
-showing seconds, minutes and hours is done by setting the leftDigitChar and rightDigitChar to the value of seconds(currentTime()), minutes(...) or hours(...).
+showing seconds, minutes, hours and day-of-week is done by setting the leftDigitChar and rightDigitChar to the particular value.
+
+Day-of-week is set according to the table below:
+
+|Index| Value      |Display|Description|
+|---|--------------|-------|-----------|
+| 0 |  0 (0000000) | -- | Never |
+| 1 |  1 (0000001) | mo | monday (m as a ñ) |
+| 2 |  2 (0000010) | tu | tuesday |
+| 3 |  4 (0000100) | wE | wednesday (w as a ū) |
+| 4 |  8 (0001000) | th | thursday |
+| 5 | 16 (0010000) | Fr | friday |
+| 6 | 32 (0100000) | SA | saturday |
+| 7 | 64 (1000000) | SU | sunday |
+| 8 | 31 (0011111) | dd | monday to friday |
+| 9 | 96 (1100000) | SS | saturday and sunday |
+|10 |127 (1111111) | AA | all days |
 
 ## 1.4 showDisplay
 Method activates the display, using the multiplex operation (switching between left and right digit). The showDisplay uses the globally defined variables:
@@ -91,21 +162,41 @@ digitMode specifies which mode the digits are operating in:
 - 3: segment mode (left and right digit char are ignored, segments and segmentFlash are used)
 
 The left and right digit chars are defined as:
-- 0 = 0
-- 1 = 1
-- 2 = 2
-- 3 = 3
-- 4 = 4
-- 5 = 5
-- 6 = 6
-- 7 = 7
-- 8 = 8
-- 9 = 9
-- 10 = <empty>
-- 11 = C
-- 12 = P
-- 13 = H
-- 14 = ..
+
+| Index | Value | Character |
+|-------|-------|-----------|
+| 0 | 0111111 | 0 |
+| 1 | 0100100 | 1 |
+| 2 | 1011110 | 2 |
+| 3 | 0000000 | 3 |
+| 4 | 0000000 | 4 |
+| 5 | 0000000 | 5 |
+| 6 | 0000000 | 6 |
+| 7 | 0000000 | 7 |
+| 8 | 0000000 | 8 |
+| 9 | 0000000 | 9 |
+|10 | 0000000 | blank |
+|11 | 0000010 | ~ (upper dash) |
+|12 | 1000000 | ~ (middle dash) |
+|13 | 0010000 | ~ (lower dash) |
+|14 | 0000000 | A |
+|15 | 0000000 | b |
+|16 | 0000000 | C |
+|17 | 0000000 | d |
+|18 | 0000000 | E |
+|19 | 0000000 | F |
+|20 | 0000000 | H |
+|21 | 1101001 | h |
+|22 | 1101100 | h (backwards) |
+|23 | 1101010 | m (displayed as ñ) |
+|24 | 0000000 | n |
+|25 | 0000000 | o |
+|26 | 0000000 | P |
+|27 | 0000000 | r |
+|28 | 0000000 | S |
+|29 | 0000000 | t |
+|30 | 0000000 | U |
+|31 | 0111010 | w (displayed as ū) |
 
 The dotMode is defined as:
 - 0 (000): dots off
@@ -137,25 +228,28 @@ rightDigitSegments and rightDigitSegmentFlash are special modes. The rightDigitS
 The rightDigitSegmentFlash will flash long-on/short-off for segments that are "on" in the rightDigitSegments variable, and will flash short-on/long-off for segments that are "off" in the rightDigitSegments variable.
 
 ## 1.5 checkAlarmAndClock
-Method checks if an alarm needs to sound. It also checks if the clock chime needs to sound. Six alarms are possible. The check is a simple comparison between the `currentTime()` function and the global variable containing the moment the alarm should sound. The alarmTime should exactly the currentTime(). If the alarm is sounding, the alarm should not be triggered again. This means that the alarmActivated value is immediately to false (because the check is done more than ones a second, which means that the value will be exactly the same more than ones). After one second the alarmActivated is reset to true for alarms 4, 5, 6, 7 and 8. The first three alarms are only activated by a button press. The alarmTime for alarms 7 and 8 are increased by a full hour.
+Method checks if an alarm needs to sound. It also checks if the clock chime needs to sound. Six alarms are possible. The check is a simple comparison between the `currentTime()` function and the global variable containing the moment the alarm should sound. The alarmTime should exactly be the currentTime(). If the alarm is sounding, the alarm should not be triggered again. This means that the alarmActivated value is immediately to false (because the check is done more than ones a second, which means that the value will be exactly the same more than ones). After one second the alarmActivated is reset to true for alarms 4, 5, 6, 7 and 8. The first three alarms are only activated by a button press. The alarmTime for alarms 7 and 8 are increased by a full hour.
 
-- alarmTime[8] (longint): the time the alarm should sound
+- alarmTime[8] (longint): the time the alarm should soundChime
 - alarmActivated[8] (boolean): false when the alarm should not go off, true when the alarm is activated.
 - alarmPaused: true if the alarm is paused (in such a case, the checkAlarmAndClock will immediately return and won't do any other function)
+- nightStart, nightEnd: when the currentTime() is in this period, alarms 7 and 8 will not sound.
+- alarmDayOfWeek[8] is compared with clockDayOfWeek for alarms 4, 5, 6, 7 and 8. These alarms will only sound when appropriate.
 
-The checkAlarmAndClock will set the melodyCount to the configured melodyCount for the particular alarm and the melodyNumber will be the alarm number. The variable melodyStep will be set to 0:
+The checkAlarmAndClock will set the melodyCount to the configured melodyCount for the particular alarm The variable melodyStep will be set to 0:
 
-- melodyNumber = number of the alarm that should sound;
-- melodyCount = alarmRepeatMode[melodyNumber];
-- melodyStep = 0.
+- chimeMelody[0..2]: from alarmChimeMelody[alarm,0..2], the melody per chime
+- melodyCount: from alarmMelodyRepeat[alarm], he number of times the melody needs to play, or 20 for continiously
+- melodyTempo: from alarmTempo[alarm], the speed of the melody
+- melodyStep: set to 0, the particular step of the melody
 
 when the alarm is the hour chime alarm and melodyCount = 20 (continuously), the melodyCount is set to the hours variable, modulo 12.
 
 ## 1.6 soundChime
 Method sounds the chime, when appropriate. The soundChime method uses the following globally defined variables (set by the checkAlarmAndClock method):
 
-- melodyNumber: the specific melody that needs to sound
-- chimeTempo: the tempo of the melody
+- chimeMelody[0..2]: the  melody that needs to sound per chime
+- melodyTempo: the tempo of the melody
 - melodyStep: the particular step of the melody (updated by this method itself)
 - melodyCount: the number the melody needs to sound
 
@@ -167,17 +261,17 @@ This function is called to set the display to the corresponding value, according
 |clockMode|Display|digitMode|dotMode|Description|
 |---|----|---|---|---------|
 | 5 | .. | 1 | 8 | See table in gotoConfigurationSubmode
-| 6 | 00 | 2 | . | alarmHours/alarmMinutes/alarmSeconds[configMode-1] from showHourMinutesSecondsStatus. It also sets the dotMode between 0, 1 and 2 |
-| 7 | r0 | 2 | 0 | leftDigitChar = r, rightDigitChar = alarmRepeatMode[0..8] |
-| 8 | -. | 2 | 0 | leftDigitChar = selectedChime, rightDigitSegment = melody bar [0..8] and melodyPosition
-| 9 | t0 | 2 | 0 | leftDigitChar = t, rightDigitChar = alarmTempo[0..8]
+| 6 | 00 | 2 | . | alarmHours/alarmMinutes/alarmSeconds[configMode-1] from sectionMode. It also sets the dotMode between 0, 1 and 2 |
+| 7 | r0 | 2 | 0 | leftDigitChar = r, rightDigitChar = alarmMelodyRepeat[0..7] |
+| 8 | -. | 3 | 0 | leftDigitChar = selectedChime, rightDigitSegment = alarmChimeMelody[0..7, selectedChime] and melodyPosition
+| 9 | t0 | 2 | 0 | leftDigitChar = t, rightDigitChar = alarmTempo[0..7]
 |10 | d0 | 2 | 0 | leftDigitChar = d, rightDigitChar = displayMode
 |11 | F0 | 2 | 0 | leftDigitChar = F, rightDigitChar = clockFineTune
 |12 | n0 | 2 | 0 | leftDigitChar = h or reverse h depening on the showStartEndStatus variable, rightDigitChar = nightStart / nightEnd
 
-In clockMode 8 (set melody), the rightDigit is controlled as a segment. This means that the segements that are "on" in the melody bar are lit. The segment that is at the melodyPosition flashes. The "on" period is short for off segments and "off" for long segments.
+In clockMode 8 (set melody), the rightDigit is controlled as a segment. This means that the segements that are "on" in the alarmChimeMelody are lit. The segment that is at the melodyPosition flashes. The "on" period is short for off segments and "off" for long segments.
 
-In clockMode 6 (set alarm), in case of alarms 4, 5 and 6 no seconds are displayed, but a value that stated at which day of the week the alarm will sound (see setAlarmHourMinutesSeconds below).
+In clockMode 6 (set alarm), in case of alarms 4, 5 and 6 no seconds are displayed.
 
 ## 2.1 button1pressed
 
@@ -275,7 +369,7 @@ Goto normal operation means that any alarm countdown should be deactivated and i
 - rightDigitChar = 10;
 - digitMode = 0;
 - dotMode = 0;
-- showHourMinutesSecondsStatus = 0;
+- sectionMode = 0;
 
 ## 3.5 pauseAlarmCountdown
 
@@ -310,33 +404,38 @@ When the alarm is paused, instead of currentTime(), the value of pausedTime shou
 
 ## 3.8 toggleHourMinutesSeconds
 
-This simple toggles the showHourMinutesSecondsStatus values between 0 en 2. The actual display is done in the clockTick method.
+This simple toggles the sectionMode values between 0 en 2. The actual display is done in the clockTick method.
 
 ## 3.9 toggleAlarmHourMinutesSeconds
 
-This toggles the showHourMinutesSecondsStatus values between 0 en 2 and calls the showConfigDisplay().
+This toggles the sectionMode values between 0 en 2 and calls the showConfigDisplay().
 
 ## 3.10 setHourMinutesSeconds
 
-Depending on the status of setHourMinutesSeconds it does the following:
+Depending on the status of sectionMode it does the following:
 
 - Reset the seconds to 0;
 - Increase minutes with 1, modulo 60;
 - Increase hours with 1, module 24;
+- Increases dayOfWeek modulo 7 with 1 (range 1..7)
 
 (the actual display is controlled by clockTick).
 
 ## 3.11 setAlarmHourMinutesSeconds
 
-Depending on the status of setHourMinutesSeconds it increases the values of alarmHours, alarmMinutes or alarmSeconds [0..2], and calls showConfigDisplay().
+Depending on the status of sectionMode it increases the values of alarmHours, alarmMinutes, alarmSeconds or alarmDayOfWeek [0..5], and calls showConfigDisplay(). For alarms 3..5, the seconds are skipped. For alarms 0..2, the day-of-week are skipped.
 
-For alarms 4, 5 and 6, the alarmSeconds are not displayed, but the following:
-
-- AA alarm will sound on every day
+- --: alarm will never sound
+- mo: alarm will only sound on monday
+- tu: alarm will only sound on tuesday
+- wE: alarm will only sound on wednesday
+- th: alarm will only sound on thursday
+- Fr: alarm will only sound on friday
 - SA: alarm will only sound on saturday
 - SU: alarm will only sound on sunday
 - SS: alarm will sound on saterday and sunday
 - dd: alarm will only sound from monday to friday
+- AA: alarm will sound on every day
 
 ## 3.12 gotoConfigurationMode
 
@@ -376,7 +475,7 @@ This changes the clock mode, depending on the configuration mode:
 |11 | 7 | r5 | Set alarm-5 repeat mode |
 |12 | 7 | r6 | Set alarm-6 repeat mode |
 |13 | 7 | rH | Set hour chime repeat mode |
-|14 | 7 | r- | Set halve hour chime repeat mode |
+|14 | 7 | r- | Set half hour chime repeat mode |
 |15 | 8 | A1 | Set alarm-1 melody |
 |16 | 8 | A2 | Set alarm-2 melody |
 |17 | 8 | A3 | Set alarm-3 melody |
@@ -384,7 +483,7 @@ This changes the clock mode, depending on the configuration mode:
 |19 | 8 | A5 | Set alarm-5 melody |
 |20 | 8 | A6 | Set alarm-6 melody |
 |21 | 8 | AH | Set hour chime melody |
-|22 | 8 | A- | Set halve hour chime melody |
+|22 | 8 | A- | Set half hour chime melody |
 |23 | 9 | t1 | Set alarm-1 melody tempo |
 |24 | 9 | t2 | Set alarm-1 melody tempo |
 |25 | 9 | t3 | Set alarm-1 melody tempo |
@@ -392,7 +491,7 @@ This changes the clock mode, depending on the configuration mode:
 |27 | 9 | t5 | Set alarm-1 melody tempo |
 |28 | 9 | t6 | Set alarm-1 melody tempo |
 |29 | 9 | tH | Set hour chime melody tempo |
-|30 | 9 | t- | Set halve hour melody tempo |
+|30 | 9 | t- | Set half hour melody tempo |
 |31 |10 | dd | Set display mode |
 |32 |11 | F  | Set clock fine-tune |
 |33 |12 | n  | Set night mode |
@@ -401,7 +500,7 @@ The clockMode is changed to the value depicted in the table below and the showCo
 
 ## 3.15 setRepeatMode
 
-Increases the alarmRepeatMode[0.8] and calls showConfigDisplay().
+Increases the alarmMelodyRepeat[0..7] and calls showConfigDisplay().
 
 ## 3.16 toggleChime
 
@@ -413,16 +512,24 @@ Toggles the melodyPosition between 1, 2, 4, 8, 16, 32, 64 and calls showConfigDi
 
 ## 3.18 setMelodyPosition
 
-Adds a bit in the melody[0..2] [0..8] at the corresponding melodyPosition or removes it.
+Adds a bit in the alarmChimeMelody[0..7,0..2] at the corresponding melodyPosition or removes it.
 
 ## 3.19 setAlarmTempo
 
-Increases alarmTempo[0..8] and calls showConfigDisplay().
+Increases alarmTempo[0..7] and calls showConfigDisplay().
 
-## 3.20 toggleStartEndStatus
+## 3.20 setDisplayMode
 
-Toggles the status of showStartEndStatus
+Toggles the status of displayMode.
 
-## 3.21 setNightMode
+## 3.21 setClockFineTune
 
-increase the value of nightStart or nightEnd, depending on the value of showStartEndStatus.
+Toggles the status of clockFineTune.
+
+## 3.22 toggleStartEndStatus
+
+Toggles the status of selectedNightParam
+
+## 3.23 setNightMode
+
+increase the value of nightStart or nightEnd, depending on the value of selectedNightParam.
