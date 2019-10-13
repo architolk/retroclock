@@ -33,13 +33,12 @@ The buttons have different functions, regarding the specific mode. By looking at
 - Display shows a number, right dot flashes: clock mode (M2), showing minutes;
 - Display shows a number, left dot flashes: clock mode (M2), showing hours;
 - First digit is a letter and both dots flash alternated: configuration select mode (M3);
-- First digit is a flashing A, bot dots are off: set alarm repeat mode (M3 A);
-- First digit is a flashing C, both dots are off: set chime hour mode (M3 C);
+- First digit is a flashing r, bot dots are off: set alarm repeat mode (M3 r);
 - First digit is a flashing d, both dots are off: set display mode (M3 d);
 - First digit is a flashing t, both dots are off: set tempo mode (M3 t);
 - First digit is a flashing F, both dots are off: set clock fine tune mode (M3 f);
 - First digit is a flashing h, both dots are off: set clock chime night mode (M3 n);
-- First digit is a flashing segment, both dots are off: set chime melody mode (M3 M);
+- First digit is a flashing segment, both dots are off: set chime melody mode (M3 A);
 - Display shows a flashing number, bot dots are off: set alarm time (M3 P), showing seconds;
 - Display shows a flashing number, right dot is flashing: set alarm time (M3 P), showing minutes;
 - Display shows a flashing H1..H9 or number, left dot is flashing: set alarm time (M3 P), showing hours;
@@ -83,7 +82,7 @@ In clock mode, the display will show seconds (both dots off), minutes (right dot
 
 ### M3 Configuration mode
 
-In configuration mode, you will enter the configurion-select mode. The digits will show a submode. The left display will always be a letter, not a number. The dots will alternate. Using button 1 (B1) you can toggle between the submodes. Using button 2 (B2) will take you to the particular configuration submode. In this particular configuration submode, the digits will show the current status. Using B3 you can toggle between these status. Using button 2 brings you back to normal operation and button 1 back to the configuration-select mode.
+In configuration mode, you will enter the configurion-select mode. The digits will show a submode. The left display will always be a letter, not a number. The dots will alternate. Using button 1 (B1) you can toggle between the submodes. Using button 2 (B2) brings you back to normal operation. Using button 3 (B3) will take you to the particular configuration submode. In this particular configuration submode, the digits will show the current status. Using B3 you can toggle between these status. Using button 2 brings you back to normal operation and button 1 back to the configuration-select mode.
 
 Submodes:
 
@@ -94,7 +93,14 @@ Submodes:
 - P4 set alarm-4 time
 - P5 set alarm-5 time
 - P6 set alarm-6 time
-- A set alarm repeat mode
+- r1 set alarm-1 repeat mode
+- r2 set alarm-2 repeat mode
+- r3 set alarm-3 repeat mode
+- r4 set alarm-4 repeat mode
+- r5 set alarm-5 repeat mode
+- r6 set alarm-6 repeat mode
+- rH set hour chime repeat mode
+- r- set halve hour chime repeat mode
 - A1 set alarm-1 chime melody
 - A2 set alarm-2 chime melody
 - A3 set alarm-3 chime melody
@@ -104,11 +110,17 @@ Submodes:
 - AH set hour chime melody
 - A- set halve hour chime melody
 - C set hour chime mode
-- tt set melody tempo
+- t1 set alarm-1 melody tempo
+- t2 set alarm-2 melody tempo
+- t3 set alarm-3 melody tempo
+- t4 set alarm-4 melody tempo
+- t5 set alarm-5 melody tempo
+- t6 set alarm-6 melody tempo
+- tH set hour melody tempo
+- t- set halve hour melody tempo
 - dd set display mode
 - F set clock fine-tune
 - n set night mode
-- C0 goto normal operation (M0)
 
 ### M3 P configuration mode
 
@@ -123,9 +135,23 @@ Alarms 1, 2 and 3 are countdown alarms: these alarms sound after a specified int
 
 Alarms 4, 5 and 6 are clock alarms: these alarms sound at a specified point in time.
 
-### M3 M melody configuration mode
+### M3 r alarm repeat configuration mode
 
-In set chime melody mode, both digits will flash, the dots are black. the left digit displays the particular chime (low, middle, high), the right displays the position at which the chime will be active. Using button-1 you can toggle between the particular chimes, using button-3 you can toggle between the different positions. And button-2 will bring you back to M0:
+In set alarm repeat mode, the left display will show a flashing "r", the left display will show the current status. Using B3 you can toggle between status. Using B1 brings you back to the configuration mode, B2 brings you back to M0.
+
+r0: chime off;
+r1: chime ones;
+r2: chime twice;
+r3: chime three times;
+...etc...
+rA: chime until a button is pressed.
+rH: chime number of hours.
+
+rA is only available for alarms 1 to 6, rH is only available for the hour chime alarm.
+
+### M3 A melody configuration mode
+
+In set chime melody mode, both digits will flash, the dots are black. the left digit displays the particular chime (low, middle, high), the right displays the position at which the chime will be active. Using button-1 you can toggle between the particular chimes, using button-2 you can toggle between the different positions. And button-3 set the melody at that position:
 - Digit off: no chime;
 - Top left segment: first position;
 - Top segment: second position;
@@ -135,17 +161,6 @@ In set chime melody mode, both digits will flash, the dots are black. the left d
 - Bottom right hash: sixth position.
 
 This way, you can create a six step melody, with three chimes. Empty positions at the start of the melody will be ignored, so if you want to repeate a three step melody, you should only use the bottom segments. If you use the top segments, you will actually create a six step melody! This is important when you want to repeat melodies.
-
-### M3 A alarm repeat configuration mode
-
-In set alarm repeat mode, the left display will show a flashing "A", the left display will show the current status. Using B3 you can toggle between status. Using B1 brings you back to the configuration mode, B2 brings you back to M0.
-
-A0: chime off;
-A1: chime ones;
-A2: chime twice;
-A3: chime three times;
-...etc...
-AA: chime until a button is pressed.
 
 ### M3 C configuration mode
 
